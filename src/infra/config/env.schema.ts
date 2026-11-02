@@ -61,6 +61,14 @@ export const envSchema = z
     // Pasta do build do web servida nos subdomínios dos casamentos (spec 007, ADR-003 do PRD).
     // Obrigatória só em produção: no desenvolvimento o site roda no Vite.
     WEB_DIST_DIR: z.string(message('deve ser um caminho')).min(1).optional(),
+    // Cabeçalho com o IP do visitante posto pelo proxy da borda (ex.: cf-connecting-ip no
+    // Cloudflare). Sem ela, vale o req.ip do Express. Só use atrás desse proxy: fora dele, qualquer
+    // um forja o cabeçalho e escapa do rate limit.
+    CLIENT_IP_HEADER: z
+      .string(message('deve ser o nome de um cabeçalho'))
+      .regex(/^[A-Za-z0-9-]+$/, { error: 'deve ser o nome de um cabeçalho, ex.: cf-connecting-ip' })
+      .transform((value) => value.toLowerCase())
+      .optional(),
     // Só em desenvolvimento: endereço https público (ex.: túnel do ngrok) que abre o painel, para
     // o OAuth do Google e do Mercado Pago voltar a ele. Ignorada fora de development.
     DEV_PANEL_URL: z

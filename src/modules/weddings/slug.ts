@@ -11,6 +11,9 @@ export const RESERVED_SLUGS = new Set([
   'cdn',
   'static',
   'assets',
+  // Subdomínios da infraestrutura de produção: painel do Easypanel e storage das fotos.
+  'infra',
+  'files',
 ]);
 
 // Minúsculas, números e hífen, sem hífen no início, no fim ou repetido.

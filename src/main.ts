@@ -19,7 +19,11 @@ async function bootstrap(): Promise<void> {
 
   const config = app.get<ConfigService<Env, true>>(ConfigService);
   const nodeEnv = config.get('NODE_ENV', { infer: true });
-  configureHttp(app, { NODE_ENV: nodeEnv, APP_DOMAIN: config.get('APP_DOMAIN', { infer: true }) });
+  configureHttp(app, {
+    NODE_ENV: nodeEnv,
+    APP_DOMAIN: config.get('APP_DOMAIN', { infer: true }),
+    CLIENT_IP_HEADER: config.get('CLIENT_IP_HEADER', { infer: true }),
+  });
   // Sessão antes do passport: o passport recarrega o usuário da sessão a cada requisição.
   const sessionEnv = { nodeEnv, secret: config.get('SESSION_SECRET', { infer: true }) };
   app.use(session(buildSessionOptions(sessionEnv, app.get<RedisClient>(REDIS_CLIENT))));

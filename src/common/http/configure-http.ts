@@ -3,6 +3,7 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
 import type { Env } from '../../infra/config/env.schema';
+import { clientIpFromHeader } from './client-ip';
 import { buildCorsOrigin } from './cors-origin';
 import { isSiteDraftJson, SITE_DRAFT_BODY_LIMIT } from './site-draft-body';
 
@@ -11,10 +12,12 @@ export const API_VERSIONING: VersioningOptions = { type: VersioningType.URI, def
 
 export function configureHttp(
   app: NestExpressApplication,
-  env: Pick<Env, 'NODE_ENV' | 'APP_DOMAIN'>,
+  env: Pick<Env, 'NODE_ENV' | 'APP_DOMAIN'> & Partial<Pick<Env, 'CLIENT_IP_HEADER'>>,
 ) {
   // Um proxy na frente da API: req.ip real no throttler e cookie secure (risco na spec 002).
   app.set('trust proxy', 1);
+  // Com Cloudflare e Traefik na frente, o IP do convidado só chega no cabeçalho da borda.
+  if (env.CLIENT_IP_HEADER) app.use(clientIpFromHeader(env.CLIENT_IP_HEADER));
 
   const secureHeaders = helmet();
   // A CSP padrão quebra o Swagger UI; ela só é relaxada em /docs, que não existe em produção.

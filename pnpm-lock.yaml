@@ -83,6 +83,9 @@ importers:
       pino-http:
         specifier: ^11.0.0
         version: 11.0.0
+      prisma:
+        specifier: ^7.10.1
+        version: 7.10.1(@types/node@26.6.5)(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)
       redis:
         specifier: ^6.3.0
         version: 6.3.0
@@ -135,9 +138,6 @@ importers:
       prettier:
         specifier: ^3.9.10
         version: 3.9.10
-      prisma:
-        specifier: ^7.10.1
-        version: 7.10.1(@types/node@26.6.5)(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)
       ts-jest:
         specifier: ^29.4.15
         version: 29.4.15(@babel/core@7.29.7)(@jest/transform@30.5.2)(@jest/types@30.5.1)(babel-jest@30.5.2(@babel/core@7.29.7))(jest-util@30.5.1)(jest@30.5.2(@types/node@26.6.5))(typescript@6.0.3)

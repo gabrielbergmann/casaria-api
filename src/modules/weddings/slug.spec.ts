@@ -16,7 +16,7 @@ describe('isValidSlug', () => {
     expect(isValidSlug(slug)).toBe(false);
   });
 
-  it('reserves exactly the slugs of PRD RF03', () => {
+  it('reserves exactly the slugs of PRD RF03 and the production infrastructure', () => {
     expect([...RESERVED_SLUGS].sort()).toEqual(
       [
         'admin',
@@ -25,7 +25,9 @@ describe('isValidSlug', () => {
         'assets',
         'blog',
         'cdn',
+        'files',
         'help',
+        'infra',
         'mail',
         'static',
         'status',
