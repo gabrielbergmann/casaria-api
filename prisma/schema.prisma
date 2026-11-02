@@ -1,0 +1,590 @@
+// Schema do CasarIA. Os models entram pelas specs de domínio (003 em diante).
+// O client é gerado em src/generated/prisma (fora do git) no postinstall.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Multi-tenant (spec 003). weddings, users, wedding_members e slug_redirects são as
+// tabelas globais; toda tabela de dados de casamento das próximas specs tem wedding_id
+// não nulo, indexado, com FK para weddings e exclusão em cascata.
+// ---------------------------------------------------------------------------
+
+enum WeddingRole {
+  owner
+  editor
+
+  @@map("wedding_role")
+}
+
+model User {
+  id           String   @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  /// Sempre em minúsculas e sem espaços nas pontas (normalizado na aplicação).
+  email        String   @unique
+  name         String
+  isSuperadmin Boolean  @default(false) @map("is_superadmin")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Credenciais (spec 004). Só o hash bcrypt; nulo para quem entra só com Google.
+  passwordHash           String?   @map("password_hash")
+  /// SHA-256 do token de redefinição gerado pelo superadmin; um por usuário.
+  passwordResetTokenHash String?   @unique @map("password_reset_token_hash")
+  passwordResetExpiresAt DateTime? @map("password_reset_expires_at") @db.Timestamptz(6)
+  /// Sobe a cada senha definida; sessão com versão anterior é recusada (ADR-002 da 004).
+  sessionVersion         Int       @default(0) @map("session_version")
+
+  // Aceite dos termos e da política (spec 015): só o último; versão AAAA-MM-DD.
+  termsAcceptedVersion String?   @map("terms_accepted_version")
+  termsAcceptedAt      DateTime? @map("terms_accepted_at") @db.Timestamptz(6)
+
+  memberships WeddingMember[]
+
+  @@map("users")
+}
+
+model Wedding {
+  id                       String    @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  slug                     String    @unique
+  /// Nome do casal num campo livre, ex.: "Ana & Bia".
+  coupleName               String    @map("couple_name")
+  weddingDate              DateTime  @map("wedding_date") @db.Timestamptz(6)
+  createdAt                DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  /// Anonimização dos dados pessoais 6 meses depois do casamento (spec 015); gravada por último.
+  personalDataAnonymizedAt DateTime? @map("personal_data_anonymized_at") @db.Timestamptz(6)
+
+  members           WeddingMember[]
+  slugRedirects     SlugRedirect[]
+  memberInvitations MemberInvitation[]
+  media             Media[]
+  siteConfig        SiteConfig?
+  invitations       Invitation[]
+  guests            Guest[]
+  guestSettings     GuestSettings?
+  rsvpSettings      RsvpSettings?
+  rsvpResponses     RsvpResponse[]
+  openRsvpResponses OpenRsvpResponse[]
+  giftCategories    GiftCategory[]
+  gifts             Gift[]
+  guestbookMessages GuestbookMessage[]
+  paymentAccount    PaymentAccount?
+  pixKey            PixKey?
+  paymentFees       PaymentFee[]
+  orders            Order[]
+  webhookEvents     WebhookEvent[]
+
+  @@map("weddings")
+}
+
+model WeddingMember {
+  id        String      @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  weddingId String      @map("wedding_id") @db.Uuid
+  userId    String      @map("user_id") @db.Uuid
+  role      WeddingRole
+  createdAt DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([weddingId, userId])
+  @@index([userId])
+  @@map("wedding_members")
+}
+
+model SlugRedirect {
+  id        String   @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  /// Slug anterior; redireciona (301) para o slug atual do casamento até expires_at.
+  oldSlug   String   @unique @map("old_slug")
+  weddingId String   @map("wedding_id") @db.Uuid
+  expiresAt DateTime @map("expires_at") @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@index([weddingId])
+  @@map("slug_redirects")
+}
+
+// Convite de acesso ao painel (spec 005): uma linha por (casamento, email). Gerar novo link
+// troca token, papel e validade na mesma linha; aceite e cancelamento apagam a linha.
+model MemberInvitation {
+  id        String      @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  weddingId String      @map("wedding_id") @db.Uuid
+  /// Sempre em minúsculas e sem espaços nas pontas.
+  email     String
+  role      WeddingRole
+  /// SHA-256 do token do link; o token em claro só aparece na resposta que o cria.
+  tokenHash String      @unique @map("token_hash")
+  expiresAt DateTime    @map("expires_at") @db.Timestamptz(6)
+  createdAt DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@unique([weddingId, email])
+  @@map("member_invitations")
+}
+
+// ---------------------------------------------------------------------------
+// Mídia (spec 006). Chaves e dimensões das versões são derivadas, sem coluna: os objetos ficam
+// em weddings/{wedding_id}/media/{id}/ no storage.
+// ---------------------------------------------------------------------------
+
+model Media {
+  /// Também é o cursor da listagem (uuidv7 cresce com o tempo).
+  id          String   @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  weddingId   String   @map("wedding_id") @db.Uuid
+  /// Detectado pelo conteúdo: image/jpeg, image/png, image/webp, image/heic ou image/avif.
+  contentType String   @map("content_type")
+  byteSize    Int      @map("byte_size")
+  /// Dimensões do original com a orientação aplicada.
+  width       Int
+  height      Int
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  gifts   Gift[]
+
+  @@index([weddingId, id])
+  @@map("media")
+}
+
+// ---------------------------------------------------------------------------
+// Site (spec 007). Um documento por casamento: draft é o rascunho do editor e published a cópia
+// lida pelo site público (nula até a primeira publicação). Sem linha, vale o documento inicial.
+// ---------------------------------------------------------------------------
+
+model SiteConfig {
+  weddingId   String    @id @map("wedding_id") @db.Uuid
+  draft       Json
+  published   Json?
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@map("site_configs")
+}
+
+// ---------------------------------------------------------------------------
+// Convidados (spec 009). Convite = família com token e código; pessoa = adulto ou criança do
+// convite, da lista ou acompanhante (origin COMPANION, criado só pelo RSVP da 010).
+// ---------------------------------------------------------------------------
+
+enum GuestOrigin {
+  LIST
+  COMPANION
+
+  @@map("guest_origin")
+}
+
+model Invitation {
+  id            String   @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  weddingId     String   @map("wedding_id") @db.Uuid
+  /// Nome do convite, ex.: "Família Souza" (até 120). Não é dado pessoal anonimizado.
+  label         String
+  maxCompanions Int      @default(0) @map("max_companions")
+  /// 128 bits em base64url (22 caracteres); vai só no fragmento do link (#convite=).
+  token         String   @unique
+  /// 6 caracteres do alfabeto sem 0/O e 1/I/L, único no casamento.
+  code          String
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  guests  Guest[]
+
+  @@unique([weddingId, code])
+  @@map("invitations")
+}
+
+model Guest {
+  id           String      @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  weddingId    String      @map("wedding_id") @db.Uuid
+  invitationId String      @map("invitation_id") @db.Uuid
+  name         String
+  isChild      Boolean     @default(false) @map("is_child")
+  /// E.164 (região padrão BR).
+  phone        String?
+  /// Em minúsculas.
+  email        String?
+  origin       GuestOrigin @default(LIST)
+  createdAt    DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime    @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  wedding    Wedding       @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  invitation Invitation    @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  rsvp       RsvpResponse?
+
+  @@index([weddingId, invitationId])
+  @@map("guests")
+}
+
+/// Sem linha, vale o texto padrão do convite.
+model GuestSettings {
+  weddingId     String   @id @map("wedding_id") @db.Uuid
+  inviteMessage String   @map("invite_message")
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@map("guest_settings")
+}
+
+// ---------------------------------------------------------------------------
+// RSVP (spec 010). Pendente = pessoa sem linha em rsvp_responses. Visitantes do modo aberto
+// ficam em open_rsvp_responses, sem convite nem pessoa.
+// ---------------------------------------------------------------------------
+
+enum RsvpStatus {
+  CONFIRMED
+  DECLINED
+
+  @@map("rsvp_status")
+}
+
+/// Sem linha, vale o padrão: modo aberto desligado e sem prazo.
+model RsvpSettings {
+  weddingId       String    @id @map("wedding_id") @db.Uuid
+  openModeEnabled Boolean   @default(false) @map("open_mode_enabled")
+  /// Nulo = sem prazo; comparado no servidor, em UTC.
+  deadline        DateTime? @db.Timestamptz(6)
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@map("rsvp_settings")
+}
+
+model RsvpResponse {
+  id           String     @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  weddingId    String     @map("wedding_id") @db.Uuid
+  guestId      String     @unique @map("guest_id") @db.Uuid
+  status       RsvpStatus
+  /// Restrição alimentar (até 500): possível dado de saúde, só no painel.
+  dietaryNotes String?    @map("dietary_notes")
+  /// Até 1.000 caracteres.
+  message      String?
+  respondedAt  DateTime   @map("responded_at") @db.Timestamptz(6)
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  guest   Guest   @relation(fields: [guestId], references: [id], onDelete: Cascade)
+
+  @@index([weddingId, status])
+  @@map("rsvp_responses")
+}
+
+model OpenRsvpResponse {
+  id        String     @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  weddingId String     @map("wedding_id") @db.Uuid
+  name      String
+  /// Telefone (E.164) ou email: ao menos um.
+  phone     String?
+  email     String?
+  status    RsvpStatus
+  message   String?
+  createdAt DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@index([weddingId, id])
+  @@map("open_rsvp_responses")
+}
+
+// ---------------------------------------------------------------------------
+// Presentes (spec 011). Catálogo lido ao vivo pela vitrine, fora do documento do site (ADR-001
+// da 011). Os contadores de cota são escritos só pelas operações chamadas por payments (012).
+//
+// CHECKs que o Prisma não expressa e entram como SQL extra na migration de gifts (o de tipo foi
+// refeito na spec 018, quando o preço fixo ganhou quantidade):
+//   ALTER TABLE gifts ADD CONSTRAINT gifts_type_fields_check CHECK (
+//     (type = 'VIRTUAL' AND price_cents > 0 AND quota_price_cents IS NULL
+//         AND (quota_total IS NULL OR quota_total > 0))
+//     OR (type = 'QUOTA' AND price_cents IS NULL AND quota_price_cents > 0 AND quota_total > 0)
+//     OR (type = 'FREE_AMOUNT' AND price_cents IS NULL AND quota_price_cents IS NULL
+//         AND quota_total IS NULL));
+//   ALTER TABLE gifts ADD CONSTRAINT gifts_quota_counters_check CHECK (
+//     quotas_sold >= 0 AND quotas_reserved >= 0
+//     AND quotas_sold + quotas_reserved <= COALESCE(quota_total, 0));
+// ---------------------------------------------------------------------------
+
+enum GiftType {
+  VIRTUAL
+  QUOTA
+  FREE_AMOUNT
+
+  @@map("gift_type")
+}
+
+/// Categoria criada pelo casal; excluir deixa os presentes sem categoria (category_id nulo).
+model GiftCategory {
+  id        String   @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  weddingId String   @map("wedding_id") @db.Uuid
+  /// Até 60 caracteres, único no casamento.
+  name      String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  gifts   Gift[]
+
+  @@unique([weddingId, name])
+  @@map("gift_categories")
+}
+
+model Gift {
+  id              String    @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  weddingId       String    @map("wedding_id") @db.Uuid
+  type            GiftType
+  title           String
+  description     String?
+  /// Foto opcional (spec 006); a exclusão da imagem é recusada enquanto o presente está ativo.
+  mediaId         String?   @map("media_id") @db.Uuid
+  categoryId      String?   @map("category_id") @db.Uuid
+  /// Ordem do catálogo: presente novo entra no fim (max + 1).
+  position        Int
+  /// VIRTUAL: preço fixo em centavos.
+  priceCents      Int?      @map("price_cents")
+  /// QUOTA: valor de cada cota em centavos e total de cotas.
+  quotaPriceCents Int?      @map("quota_price_cents")
+  /// QUOTA: total de cotas. VIRTUAL: quantidade de unidades, nulo = sem limite (spec 018); os
+  /// contadores abaixo valem para as duas.
+  quotaTotal      Int?      @map("quota_total")
+  quotasSold      Int       @default(0) @map("quotas_sold")
+  quotasReserved  Int       @default(0) @map("quotas_reserved")
+  /// Esgotado some da vitrine em vez de aparecer como "Já presenteado" (spec 018).
+  hideWhenSoldOut Boolean   @default(false) @map("hide_when_sold_out")
+  /// Exclusão lógica: some do painel e da vitrine; os pedidos da 012 seguem com o título.
+  deletedAt       DateTime? @map("deleted_at") @db.Timestamptz(6)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  wedding  Wedding       @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  media    Media?        @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+  category GiftCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  orders   Order[]
+
+  @@index([weddingId, position])
+  @@map("gifts")
+}
+
+// ---------------------------------------------------------------------------
+// Mural de recados (spec 013), no módulo gifts. Todo recado nasce PENDING e o site mostra só
+// APPROVED; a moderação muda o status, sem exclusão definitiva. Recados não são anonimizados.
+// ---------------------------------------------------------------------------
+
+enum GuestbookStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  HIDDEN
+
+  @@map("guestbook_status")
+}
+
+model GuestbookMessage {
+  id         String          @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  weddingId  String          @map("wedding_id") @db.Uuid
+  /// 1 a 120 caracteres, sem os espaços das pontas; texto puro.
+  authorName String          @map("author_name")
+  /// 1 a 1.000 caracteres, sem os espaços das pontas; texto puro.
+  body       String
+  status     GuestbookStatus @default(PENDING)
+  createdAt  DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@index([weddingId, status, createdAt])
+  @@map("guestbook_messages")
+}
+
+// ---------------------------------------------------------------------------
+// Pagamentos (spec 012). A conta Mercado Pago é do casal (OAuth); tokens e CPF só cifrados com a
+// ENCRYPTION_KEY. Pedido = um presente (cotas ou valor livre) com no máximo uma cobrança.
+// ---------------------------------------------------------------------------
+
+enum PaymentAccountStatus {
+  CONNECTED
+  DISCONNECTED
+
+  @@map("payment_account_status")
+}
+
+enum DisconnectReason {
+  OWNER
+  REFRESH_FAILED
+  DEAUTHORIZED
+
+  @@map("disconnect_reason")
+}
+
+enum PaymentMethod {
+  PIX
+  CARD
+  /// Pix na chave do casal, sem gateway e sem taxa (spec 017).
+  PIX_DIRECT
+
+  @@map("payment_method")
+}
+
+/// Transições permitidas ficam no service (tabela da spec 012).
+enum OrderStatus {
+  PENDING
+  IN_PROCESS
+  APPROVED
+  REJECTED
+  EXPIRED
+  REFUNDED
+  CHARGED_BACK
+  /// Pix direto declarado pelo convidado, esperando o casal confirmar (spec 017).
+  AWAITING_CONFIRMATION
+
+  @@map("order_status")
+}
+
+enum PixKeyType {
+  CPF
+  CNPJ
+  PHONE
+  EMAIL
+  RANDOM
+
+  @@map("pix_key_type")
+}
+
+/// Chave Pix do casal para o Pix direto (spec 017); guardada normalizada, nunca logada.
+model PixKey {
+  id        String     @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  weddingId String     @unique @map("wedding_id") @db.Uuid
+  keyType   PixKeyType @map("key_type")
+  key       String
+  updatedAt DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@map("pix_keys")
+}
+
+model PaymentAccount {
+  id               String               @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  weddingId        String               @unique @map("wedding_id") @db.Uuid
+  /// Id do usuário no Mercado Pago: acha o casamento no aviso de desautorização (ADR-002 da 012).
+  providerUserId   String               @map("provider_user_id")
+  /// Public key do casal, entregue ao Brick no checkout de cartão.
+  publicKey        String               @map("public_key")
+  /// Nulos depois de desconectar (RF03).
+  accessTokenEnc   String?              @map("access_token_enc")
+  refreshTokenEnc  String?              @map("refresh_token_enc")
+  expiresAt        DateTime?            @map("expires_at") @db.Timestamptz(6)
+  status           PaymentAccountStatus
+  disconnectReason DisconnectReason?    @map("disconnect_reason")
+  connectedAt      DateTime             @map("connected_at") @db.Timestamptz(6)
+  disconnectedAt   DateTime?            @map("disconnected_at") @db.Timestamptz(6)
+  updatedAt        DateTime             @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@index([providerUserId])
+  @@map("payment_accounts")
+}
+
+/// Sem linha, vale o padrão (zero até o owner configurar).
+model PaymentFee {
+  id         String        @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  weddingId  String        @map("wedding_id") @db.Uuid
+  method     PaymentMethod
+  /// Pontos-base: 499 = 4,99%. De 0 a 9999.
+  percentBps Int           @map("percent_bps")
+  fixedCents Int           @map("fixed_cents")
+  updatedAt  DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@unique([weddingId, method])
+  @@map("payment_fees")
+}
+
+model Order {
+  id                   String        @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  weddingId            String        @map("wedding_id") @db.Uuid
+  giftId               String        @map("gift_id") @db.Uuid
+  /// Cotas do pedido; 1 em preço fixo e valor livre.
+  quantity             Int
+  priceCents           Int           @map("price_cents")
+  feeCents             Int           @map("fee_cents")
+  totalCents           Int           @map("total_cents")
+  method               PaymentMethod
+  /// Parcelas do cartão (1 a 12); nulo no Pix e antes do envio do cartão.
+  installments         Int?
+  status               OrderStatus   @default(PENDING)
+  /// "Pagador anonimizado" depois da anonimização (spec 015).
+  payerName            String        @map("payer_name")
+  /// Nulos depois da anonimização (spec 015).
+  payerEmail           String?       @map("payer_email")
+  payerCpfEnc          String?       @map("payer_cpf_enc")
+  /// Mensagem ao casal, até 1.000 caracteres.
+  message              String?
+  /// "Não mostrar meu nome ao casal": Recebidos mostra "Anônimo".
+  isAnonymous          Boolean       @default(false) @map("is_anonymous")
+  reservationExpiresAt DateTime      @map("reservation_expires_at") @db.Timestamptz(6)
+  /// Id da cobrança no Mercado Pago (order da Orders API); no máximo uma por pedido.
+  providerPaymentId    String?       @unique @map("provider_payment_id")
+  approvedAt           DateTime?     @map("approved_at") @db.Timestamptz(6)
+  /// Marcado pela spec 014.
+  thankedAt            DateTime?     @map("thanked_at") @db.Timestamptz(6)
+  createdAt            DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  /// NoAction (checado no fim do comando): a exclusão do casamento apaga presentes e pedidos juntos.
+  gift    Gift    @relation(fields: [giftId], references: [id], onDelete: NoAction)
+
+  @@index([weddingId, status])
+  @@index([weddingId, approvedAt])
+  @@map("orders")
+}
+
+/// Aviso do Mercado Pago já recebido (idempotência pelo x-request-id); sem o corpo bruto.
+model WebhookEvent {
+  id          String    @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  weddingId   String    @map("wedding_id") @db.Uuid
+  requestId   String    @unique @map("request_id")
+  topic       String
+  dataId      String    @map("data_id")
+  receivedAt  DateTime  @default(now()) @map("received_at") @db.Timestamptz(6)
+  processedAt DateTime? @map("processed_at") @db.Timestamptz(6)
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@index([weddingId])
+  @@map("webhook_events")
+}
+
+// ---------------------------------------------------------------------------
+// Auditoria (spec 004, PRD RF40). Tabela global: não cai com o casamento.
+// ---------------------------------------------------------------------------
+
+model AuditLog {
+  id          String   @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  occurredAt  DateTime @default(now()) @map("occurred_at") @db.Timestamptz(6)
+  /// payments.account_connected, payments.account_disconnected, payments.fees_changed,
+  /// payments.pix_key_changed, payments.pix_key_removed, payments.direct_pix_confirmed,
+  /// payments.direct_pix_not_received, superadmin.request
+  action      String
+  /// Nulo quando a ação é do sistema.
+  actorUserId String?  @map("actor_user_id") @db.Uuid
+  /// Sem FK: o registro permanece depois da exclusão do casamento.
+  weddingId   String?  @map("wedding_id") @db.Uuid
+  /// Só ids e valores não pessoais.
+  metadata    Json     @default("{}")
+
+  @@index([weddingId, occurredAt])
+  @@map("audit_logs")
+}

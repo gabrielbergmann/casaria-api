@@ -1,0 +1,5 @@
+dist
+coverage
+src/generated
+openapi.json
+pnpm-lock.yaml
