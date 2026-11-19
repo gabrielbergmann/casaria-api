@@ -163,6 +163,18 @@ describe('SiteConfigSchema', () => {
     ).toEqual(['sections.2.content.ceremony.startsAt']);
   });
 
+  it('accepts the party at the ceremony venue, with only time and notes', () => {
+    const ceremony = { venueName: 'Sítio', address: 'Estrada B, 2' };
+    const party = { venueName: '', address: '', startsAt: '2027-05-15T21:00:00.000Z' };
+
+    expect(issuesOf(withSection(base, 'ceremony', { ceremony, party, sameVenue: true }))).toEqual(
+      [],
+    );
+    expect(issuesOf(withSection(base, 'ceremony', { ceremony, party, sameVenue: 'sim' }))).toEqual([
+      'sections.2.content.sameVenue',
+    ]);
+  });
+
   it('rejects an image id that is not a uuid', () => {
     expect(issuesOf(withSection(base, 'gallery', { mediaIds: ['../x.jpg'] }))).toEqual([
       'sections.6.content.mediaIds.0',

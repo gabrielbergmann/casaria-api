@@ -50,7 +50,12 @@ export const SectionSchema = z
     section('story', z.object({ text, mediaIds: z.array(mediaId) })),
     section(
       'ceremony',
-      z.object({ ceremony: EventSchema.nullable(), party: EventSchema.nullable() }),
+      z.object({
+        ceremony: EventSchema.nullable(),
+        party: EventSchema.nullable(),
+        /** Festa no mesmo local da cerimônia: o site mostra um cartão só, com os dois horários. */
+        sameVenue: z.boolean().optional(),
+      }),
     ),
     section('dressCode', z.object({ text })),
     section(
