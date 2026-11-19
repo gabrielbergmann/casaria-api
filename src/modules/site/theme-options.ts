@@ -9,6 +9,10 @@ export const FONT_FAMILIES = [
   'Montserrat',
   'Open Sans',
   'Raleway',
+  // Fora do Google Fonts: a Times New Roman vem do sistema e a Parfumerie Script (Typesenses,
+  // licença web) é servida pelo próprio site.
+  'Times New Roman',
+  'Parfumerie Script',
 ] as const;
 
 export type FontFamily = (typeof FONT_FAMILIES)[number];

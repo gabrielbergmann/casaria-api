@@ -58,8 +58,8 @@ describe('initialSiteConfig', () => {
 });
 
 describe('theme options', () => {
-  it('offers the eight curated fonts and 4 to 6 palettes', () => {
-    expect(FONT_FAMILIES).toHaveLength(8);
+  it('offers the ten curated fonts and 4 to 6 palettes', () => {
+    expect(FONT_FAMILIES).toHaveLength(10);
     expect(PALETTES.length).toBeGreaterThanOrEqual(4);
     expect(PALETTES.length).toBeLessThanOrEqual(6);
   });
