@@ -5,7 +5,7 @@ const EMPTY_SECTIONS: SiteSection[] = [
   { type: 'hero', enabled: true, content: {} },
   { type: 'story', enabled: true, content: { text: '', mediaIds: [] } },
   { type: 'ceremony', enabled: true, content: { ceremony: null, party: null } },
-  { type: 'dressCode', enabled: true, content: { text: '' } },
+  { type: 'dressCode', enabled: true, content: { text: '', mediaIds: [] } },
   { type: 'weddingParty', enabled: true, content: { people: [] } },
   { type: 'lodging', enabled: true, content: { items: [] } },
   { type: 'gallery', enabled: true, content: { mediaIds: [] } },

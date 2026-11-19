@@ -57,7 +57,11 @@ export const SectionSchema = z
         sameVenue: z.boolean().optional(),
       }),
     ),
-    section('dressCode', z.object({ text })),
+    section(
+      'dressCode',
+      /** Fotos de inspiração do traje; opcional porque os documentos antigos não têm. */
+      z.object({ text, mediaIds: z.array(mediaId).optional() }),
+    ),
     section(
       'weddingParty',
       z.object({

@@ -432,6 +432,23 @@ describe('SiteService', () => {
       expect(repository.find).toHaveBeenCalledWith('wedding-a');
     });
 
+    it('counts a dress code photo as in use', async () => {
+      const draft = initialSiteConfig();
+      draft.sections = draft.sections.map((section) =>
+        section.type === 'dressCode'
+          ? { ...section, content: { text: 'Esporte fino', mediaIds: [GALLERY] } }
+          : section,
+      );
+      repository.find.mockResolvedValue({
+        draft,
+        published: null,
+        publishedAt: null,
+        updatedAt: UPDATED_AT,
+      });
+
+      await expect(checker.isInUse('wedding-a', GALLERY)).resolves.toBe(true);
+    });
+
     it('says no when the wedding has no site document', async () => {
       repository.find.mockResolvedValue(null);
 

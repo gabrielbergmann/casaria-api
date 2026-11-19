@@ -11,6 +11,9 @@ export function collectMediaIds(config: SiteConfig): string[] {
       case 'album':
         ids.push(...section.content.mediaIds);
         break;
+      case 'dressCode':
+        ids.push(...(section.content.mediaIds ?? []));
+        break;
       case 'weddingParty':
         for (const person of section.content.people) if (person.mediaId) ids.push(person.mediaId);
         break;

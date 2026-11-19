@@ -175,6 +175,18 @@ describe('SiteConfigSchema', () => {
     ]);
   });
 
+  it('accepts dress code photos and the old dress code without them', () => {
+    const photo = '0190a1b2-c3d4-7e5f-8a9b-0c1d2e3f4a5b';
+
+    expect(issuesOf(withSection(base, 'dressCode', { text: 'Esporte fino' }))).toEqual([]);
+    expect(
+      issuesOf(withSection(base, 'dressCode', { text: 'Esporte fino', mediaIds: [photo] })),
+    ).toEqual([]);
+    expect(issuesOf(withSection(base, 'dressCode', { text: '', mediaIds: ['x.jpg'] }))).toEqual([
+      'sections.3.content.mediaIds.0',
+    ]);
+  });
+
   it('rejects an image id that is not a uuid', () => {
     expect(issuesOf(withSection(base, 'gallery', { mediaIds: ['../x.jpg'] }))).toEqual([
       'sections.6.content.mediaIds.0',
