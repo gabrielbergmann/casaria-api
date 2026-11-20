@@ -3383,7 +3383,7 @@
                 "type": "object",
                 "properties": {
                   "text": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/RichText_Output"
                   },
                   "mediaIds": {
                     "type": "array",
@@ -3483,7 +3483,7 @@
                 "type": "object",
                 "properties": {
                   "text": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/RichText_Output"
                   },
                   "mediaIds": {
                     "type": "array",
@@ -3593,7 +3593,7 @@
                           "type": "string"
                         },
                         "description": {
-                          "type": "string"
+                          "$ref": "#/components/schemas/RichText_Output"
                         },
                         "url": {
                           "anyOf": [
@@ -3664,7 +3664,7 @@
                           "type": "string"
                         },
                         "description": {
-                          "type": "string"
+                          "$ref": "#/components/schemas/RichText_Output"
                         },
                         "url": {
                           "anyOf": [
@@ -3777,7 +3777,7 @@
                           "type": "string"
                         },
                         "answer": {
-                          "type": "string"
+                          "$ref": "#/components/schemas/RichText_Output"
                         },
                         "icon": {
                           "type": "string",
@@ -4032,7 +4032,7 @@
                     "type": "string"
                   },
                   "text": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/RichText_Output"
                   }
                 },
                 "required": [
@@ -4051,6 +4051,881 @@
           }
         ]
       },
+      "RichText_Output": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "doc"
+                ]
+              },
+              "content": {
+                "type": "array",
+                "items": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/RichTextParagraph_Output"
+                    },
+                    {
+                      "$ref": "#/components/schemas/RichTextHeading_Output"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "bulletList"
+                          ]
+                        },
+                        "content": {
+                          "minItems": 1,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "listItem"
+                                ]
+                              },
+                              "content": {
+                                "minItems": 1,
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "$ref": "#/components/schemas/RichTextParagraph_Output"
+                                    },
+                                    {
+                                      "type": "object",
+                                      "properties": {
+                                        "type": {
+                                          "type": "string",
+                                          "enum": [
+                                            "bulletList"
+                                          ]
+                                        },
+                                        "content": {
+                                          "minItems": 1,
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "type": {
+                                                "type": "string",
+                                                "enum": [
+                                                  "listItem"
+                                                ]
+                                              },
+                                              "content": {
+                                                "minItems": 1,
+                                                "type": "array",
+                                                "items": {
+                                                  "anyOf": [
+                                                    {
+                                                      "$ref": "#/components/schemas/RichTextParagraph_Output"
+                                                    },
+                                                    {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "type": {
+                                                          "type": "string",
+                                                          "enum": [
+                                                            "bulletList"
+                                                          ]
+                                                        },
+                                                        "content": {
+                                                          "minItems": 1,
+                                                          "type": "array",
+                                                          "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                              "type": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "listItem"
+                                                                ]
+                                                              },
+                                                              "content": {
+                                                                "minItems": 1,
+                                                                "type": "array",
+                                                                "items": {
+                                                                  "$ref": "#/components/schemas/RichTextParagraph_Output"
+                                                                }
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "type",
+                                                              "content"
+                                                            ],
+                                                            "additionalProperties": false
+                                                          }
+                                                        }
+                                                      },
+                                                      "required": [
+                                                        "type",
+                                                        "content"
+                                                      ],
+                                                      "additionalProperties": false
+                                                    },
+                                                    {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "type": {
+                                                          "type": "string",
+                                                          "enum": [
+                                                            "orderedList"
+                                                          ]
+                                                        },
+                                                        "content": {
+                                                          "minItems": 1,
+                                                          "type": "array",
+                                                          "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                              "type": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "listItem"
+                                                                ]
+                                                              },
+                                                              "content": {
+                                                                "minItems": 1,
+                                                                "type": "array",
+                                                                "items": {
+                                                                  "$ref": "#/components/schemas/RichTextParagraph_Output"
+                                                                }
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "type",
+                                                              "content"
+                                                            ],
+                                                            "additionalProperties": false
+                                                          }
+                                                        }
+                                                      },
+                                                      "required": [
+                                                        "type",
+                                                        "content"
+                                                      ],
+                                                      "additionalProperties": false
+                                                    }
+                                                  ]
+                                                }
+                                              }
+                                            },
+                                            "required": [
+                                              "type",
+                                              "content"
+                                            ],
+                                            "additionalProperties": false
+                                          }
+                                        }
+                                      },
+                                      "required": [
+                                        "type",
+                                        "content"
+                                      ],
+                                      "additionalProperties": false
+                                    },
+                                    {
+                                      "type": "object",
+                                      "properties": {
+                                        "type": {
+                                          "type": "string",
+                                          "enum": [
+                                            "orderedList"
+                                          ]
+                                        },
+                                        "content": {
+                                          "minItems": 1,
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "type": {
+                                                "type": "string",
+                                                "enum": [
+                                                  "listItem"
+                                                ]
+                                              },
+                                              "content": {
+                                                "minItems": 1,
+                                                "type": "array",
+                                                "items": {
+                                                  "anyOf": [
+                                                    {
+                                                      "$ref": "#/components/schemas/RichTextParagraph_Output"
+                                                    },
+                                                    {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "type": {
+                                                          "type": "string",
+                                                          "enum": [
+                                                            "bulletList"
+                                                          ]
+                                                        },
+                                                        "content": {
+                                                          "minItems": 1,
+                                                          "type": "array",
+                                                          "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                              "type": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "listItem"
+                                                                ]
+                                                              },
+                                                              "content": {
+                                                                "minItems": 1,
+                                                                "type": "array",
+                                                                "items": {
+                                                                  "$ref": "#/components/schemas/RichTextParagraph_Output"
+                                                                }
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "type",
+                                                              "content"
+                                                            ],
+                                                            "additionalProperties": false
+                                                          }
+                                                        }
+                                                      },
+                                                      "required": [
+                                                        "type",
+                                                        "content"
+                                                      ],
+                                                      "additionalProperties": false
+                                                    },
+                                                    {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "type": {
+                                                          "type": "string",
+                                                          "enum": [
+                                                            "orderedList"
+                                                          ]
+                                                        },
+                                                        "content": {
+                                                          "minItems": 1,
+                                                          "type": "array",
+                                                          "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                              "type": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "listItem"
+                                                                ]
+                                                              },
+                                                              "content": {
+                                                                "minItems": 1,
+                                                                "type": "array",
+                                                                "items": {
+                                                                  "$ref": "#/components/schemas/RichTextParagraph_Output"
+                                                                }
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "type",
+                                                              "content"
+                                                            ],
+                                                            "additionalProperties": false
+                                                          }
+                                                        }
+                                                      },
+                                                      "required": [
+                                                        "type",
+                                                        "content"
+                                                      ],
+                                                      "additionalProperties": false
+                                                    }
+                                                  ]
+                                                }
+                                              }
+                                            },
+                                            "required": [
+                                              "type",
+                                              "content"
+                                            ],
+                                            "additionalProperties": false
+                                          }
+                                        }
+                                      },
+                                      "required": [
+                                        "type",
+                                        "content"
+                                      ],
+                                      "additionalProperties": false
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "content"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "content"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "orderedList"
+                          ]
+                        },
+                        "content": {
+                          "minItems": 1,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "listItem"
+                                ]
+                              },
+                              "content": {
+                                "minItems": 1,
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "$ref": "#/components/schemas/RichTextParagraph_Output"
+                                    },
+                                    {
+                                      "type": "object",
+                                      "properties": {
+                                        "type": {
+                                          "type": "string",
+                                          "enum": [
+                                            "bulletList"
+                                          ]
+                                        },
+                                        "content": {
+                                          "minItems": 1,
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "type": {
+                                                "type": "string",
+                                                "enum": [
+                                                  "listItem"
+                                                ]
+                                              },
+                                              "content": {
+                                                "minItems": 1,
+                                                "type": "array",
+                                                "items": {
+                                                  "anyOf": [
+                                                    {
+                                                      "$ref": "#/components/schemas/RichTextParagraph_Output"
+                                                    },
+                                                    {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "type": {
+                                                          "type": "string",
+                                                          "enum": [
+                                                            "bulletList"
+                                                          ]
+                                                        },
+                                                        "content": {
+                                                          "minItems": 1,
+                                                          "type": "array",
+                                                          "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                              "type": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "listItem"
+                                                                ]
+                                                              },
+                                                              "content": {
+                                                                "minItems": 1,
+                                                                "type": "array",
+                                                                "items": {
+                                                                  "$ref": "#/components/schemas/RichTextParagraph_Output"
+                                                                }
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "type",
+                                                              "content"
+                                                            ],
+                                                            "additionalProperties": false
+                                                          }
+                                                        }
+                                                      },
+                                                      "required": [
+                                                        "type",
+                                                        "content"
+                                                      ],
+                                                      "additionalProperties": false
+                                                    },
+                                                    {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "type": {
+                                                          "type": "string",
+                                                          "enum": [
+                                                            "orderedList"
+                                                          ]
+                                                        },
+                                                        "content": {
+                                                          "minItems": 1,
+                                                          "type": "array",
+                                                          "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                              "type": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "listItem"
+                                                                ]
+                                                              },
+                                                              "content": {
+                                                                "minItems": 1,
+                                                                "type": "array",
+                                                                "items": {
+                                                                  "$ref": "#/components/schemas/RichTextParagraph_Output"
+                                                                }
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "type",
+                                                              "content"
+                                                            ],
+                                                            "additionalProperties": false
+                                                          }
+                                                        }
+                                                      },
+                                                      "required": [
+                                                        "type",
+                                                        "content"
+                                                      ],
+                                                      "additionalProperties": false
+                                                    }
+                                                  ]
+                                                }
+                                              }
+                                            },
+                                            "required": [
+                                              "type",
+                                              "content"
+                                            ],
+                                            "additionalProperties": false
+                                          }
+                                        }
+                                      },
+                                      "required": [
+                                        "type",
+                                        "content"
+                                      ],
+                                      "additionalProperties": false
+                                    },
+                                    {
+                                      "type": "object",
+                                      "properties": {
+                                        "type": {
+                                          "type": "string",
+                                          "enum": [
+                                            "orderedList"
+                                          ]
+                                        },
+                                        "content": {
+                                          "minItems": 1,
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "type": {
+                                                "type": "string",
+                                                "enum": [
+                                                  "listItem"
+                                                ]
+                                              },
+                                              "content": {
+                                                "minItems": 1,
+                                                "type": "array",
+                                                "items": {
+                                                  "anyOf": [
+                                                    {
+                                                      "$ref": "#/components/schemas/RichTextParagraph_Output"
+                                                    },
+                                                    {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "type": {
+                                                          "type": "string",
+                                                          "enum": [
+                                                            "bulletList"
+                                                          ]
+                                                        },
+                                                        "content": {
+                                                          "minItems": 1,
+                                                          "type": "array",
+                                                          "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                              "type": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "listItem"
+                                                                ]
+                                                              },
+                                                              "content": {
+                                                                "minItems": 1,
+                                                                "type": "array",
+                                                                "items": {
+                                                                  "$ref": "#/components/schemas/RichTextParagraph_Output"
+                                                                }
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "type",
+                                                              "content"
+                                                            ],
+                                                            "additionalProperties": false
+                                                          }
+                                                        }
+                                                      },
+                                                      "required": [
+                                                        "type",
+                                                        "content"
+                                                      ],
+                                                      "additionalProperties": false
+                                                    },
+                                                    {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "type": {
+                                                          "type": "string",
+                                                          "enum": [
+                                                            "orderedList"
+                                                          ]
+                                                        },
+                                                        "content": {
+                                                          "minItems": 1,
+                                                          "type": "array",
+                                                          "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                              "type": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "listItem"
+                                                                ]
+                                                              },
+                                                              "content": {
+                                                                "minItems": 1,
+                                                                "type": "array",
+                                                                "items": {
+                                                                  "$ref": "#/components/schemas/RichTextParagraph_Output"
+                                                                }
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "type",
+                                                              "content"
+                                                            ],
+                                                            "additionalProperties": false
+                                                          }
+                                                        }
+                                                      },
+                                                      "required": [
+                                                        "type",
+                                                        "content"
+                                                      ],
+                                                      "additionalProperties": false
+                                                    }
+                                                  ]
+                                                }
+                                              }
+                                            },
+                                            "required": [
+                                              "type",
+                                              "content"
+                                            ],
+                                            "additionalProperties": false
+                                          }
+                                        }
+                                      },
+                                      "required": [
+                                        "type",
+                                        "content"
+                                      ],
+                                      "additionalProperties": false
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "content"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "content"
+                      ],
+                      "additionalProperties": false
+                    }
+                  ]
+                }
+              }
+            },
+            "required": [
+              "type",
+              "content"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "RichTextParagraph_Output": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "paragraph"
+            ]
+          },
+          "attrs": {
+            "type": "object",
+            "properties": {
+              "textAlign": {
+                "type": "string",
+                "enum": [
+                  "left",
+                  "center",
+                  "right"
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RichTextInline_Output"
+            }
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "additionalProperties": false
+      },
+      "RichTextInline_Output": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "text"
+                ]
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1
+              },
+              "marks": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RichTextMark_Output"
+                }
+              }
+            },
+            "required": [
+              "type",
+              "text"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "hardBreak"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "RichTextMark_Output": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "bold"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "italic"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "underline"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "link"
+                ]
+              },
+              "attrs": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                },
+                "required": [
+                  "href"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "type",
+              "attrs"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "RichTextHeading_Output": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "heading"
+            ]
+          },
+          "attrs": {
+            "type": "object",
+            "properties": {
+              "level": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "enum": [
+                      3
+                    ]
+                  },
+                  {
+                    "type": "number",
+                    "enum": [
+                      4
+                    ]
+                  }
+                ]
+              },
+              "textAlign": {
+                "type": "string",
+                "enum": [
+                  "left",
+                  "center",
+                  "right"
+                ]
+              }
+            },
+            "required": [
+              "level"
+            ],
+            "additionalProperties": false
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RichTextInline_Output"
+            }
+          }
+        },
+        "required": [
+          "type",
+          "attrs"
+        ],
+        "additionalProperties": false
+      },
       "SiteEvent_Output": {
         "type": "object",
         "properties": {
@@ -4066,7 +4941,7 @@
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
           },
           "notes": {
-            "type": "string"
+            "$ref": "#/components/schemas/RichText_Output"
           },
           "icons": {
             "type": "object",
@@ -4335,7 +5210,7 @@
                 "type": "object",
                 "properties": {
                   "text": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/RichText"
                   },
                   "mediaIds": {
                     "type": "array",
@@ -4431,7 +5306,7 @@
                 "type": "object",
                 "properties": {
                   "text": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/RichText"
                   },
                   "mediaIds": {
                     "type": "array",
@@ -4536,7 +5411,7 @@
                           "type": "string"
                         },
                         "description": {
-                          "type": "string"
+                          "$ref": "#/components/schemas/RichText"
                         },
                         "url": {
                           "anyOf": [
@@ -4604,7 +5479,7 @@
                           "type": "string"
                         },
                         "description": {
-                          "type": "string"
+                          "$ref": "#/components/schemas/RichText"
                         },
                         "url": {
                           "anyOf": [
@@ -4712,7 +5587,7 @@
                           "type": "string"
                         },
                         "answer": {
-                          "type": "string"
+                          "$ref": "#/components/schemas/RichText"
                         },
                         "icon": {
                           "type": "string",
@@ -4953,7 +5828,7 @@
                     "type": "string"
                   },
                   "text": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/RichText"
                   }
                 },
                 "required": [
@@ -4970,6 +5845,881 @@
           }
         ]
       },
+      "RichText": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "doc"
+                ]
+              },
+              "content": {
+                "type": "array",
+                "items": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/RichTextParagraph"
+                    },
+                    {
+                      "$ref": "#/components/schemas/RichTextHeading"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "bulletList"
+                          ]
+                        },
+                        "content": {
+                          "minItems": 1,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "listItem"
+                                ]
+                              },
+                              "content": {
+                                "minItems": 1,
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "$ref": "#/components/schemas/RichTextParagraph"
+                                    },
+                                    {
+                                      "type": "object",
+                                      "properties": {
+                                        "type": {
+                                          "type": "string",
+                                          "enum": [
+                                            "bulletList"
+                                          ]
+                                        },
+                                        "content": {
+                                          "minItems": 1,
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "type": {
+                                                "type": "string",
+                                                "enum": [
+                                                  "listItem"
+                                                ]
+                                              },
+                                              "content": {
+                                                "minItems": 1,
+                                                "type": "array",
+                                                "items": {
+                                                  "anyOf": [
+                                                    {
+                                                      "$ref": "#/components/schemas/RichTextParagraph"
+                                                    },
+                                                    {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "type": {
+                                                          "type": "string",
+                                                          "enum": [
+                                                            "bulletList"
+                                                          ]
+                                                        },
+                                                        "content": {
+                                                          "minItems": 1,
+                                                          "type": "array",
+                                                          "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                              "type": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "listItem"
+                                                                ]
+                                                              },
+                                                              "content": {
+                                                                "minItems": 1,
+                                                                "type": "array",
+                                                                "items": {
+                                                                  "$ref": "#/components/schemas/RichTextParagraph"
+                                                                }
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "type",
+                                                              "content"
+                                                            ],
+                                                            "additionalProperties": false
+                                                          }
+                                                        }
+                                                      },
+                                                      "required": [
+                                                        "type",
+                                                        "content"
+                                                      ],
+                                                      "additionalProperties": false
+                                                    },
+                                                    {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "type": {
+                                                          "type": "string",
+                                                          "enum": [
+                                                            "orderedList"
+                                                          ]
+                                                        },
+                                                        "content": {
+                                                          "minItems": 1,
+                                                          "type": "array",
+                                                          "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                              "type": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "listItem"
+                                                                ]
+                                                              },
+                                                              "content": {
+                                                                "minItems": 1,
+                                                                "type": "array",
+                                                                "items": {
+                                                                  "$ref": "#/components/schemas/RichTextParagraph"
+                                                                }
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "type",
+                                                              "content"
+                                                            ],
+                                                            "additionalProperties": false
+                                                          }
+                                                        }
+                                                      },
+                                                      "required": [
+                                                        "type",
+                                                        "content"
+                                                      ],
+                                                      "additionalProperties": false
+                                                    }
+                                                  ]
+                                                }
+                                              }
+                                            },
+                                            "required": [
+                                              "type",
+                                              "content"
+                                            ],
+                                            "additionalProperties": false
+                                          }
+                                        }
+                                      },
+                                      "required": [
+                                        "type",
+                                        "content"
+                                      ],
+                                      "additionalProperties": false
+                                    },
+                                    {
+                                      "type": "object",
+                                      "properties": {
+                                        "type": {
+                                          "type": "string",
+                                          "enum": [
+                                            "orderedList"
+                                          ]
+                                        },
+                                        "content": {
+                                          "minItems": 1,
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "type": {
+                                                "type": "string",
+                                                "enum": [
+                                                  "listItem"
+                                                ]
+                                              },
+                                              "content": {
+                                                "minItems": 1,
+                                                "type": "array",
+                                                "items": {
+                                                  "anyOf": [
+                                                    {
+                                                      "$ref": "#/components/schemas/RichTextParagraph"
+                                                    },
+                                                    {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "type": {
+                                                          "type": "string",
+                                                          "enum": [
+                                                            "bulletList"
+                                                          ]
+                                                        },
+                                                        "content": {
+                                                          "minItems": 1,
+                                                          "type": "array",
+                                                          "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                              "type": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "listItem"
+                                                                ]
+                                                              },
+                                                              "content": {
+                                                                "minItems": 1,
+                                                                "type": "array",
+                                                                "items": {
+                                                                  "$ref": "#/components/schemas/RichTextParagraph"
+                                                                }
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "type",
+                                                              "content"
+                                                            ],
+                                                            "additionalProperties": false
+                                                          }
+                                                        }
+                                                      },
+                                                      "required": [
+                                                        "type",
+                                                        "content"
+                                                      ],
+                                                      "additionalProperties": false
+                                                    },
+                                                    {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "type": {
+                                                          "type": "string",
+                                                          "enum": [
+                                                            "orderedList"
+                                                          ]
+                                                        },
+                                                        "content": {
+                                                          "minItems": 1,
+                                                          "type": "array",
+                                                          "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                              "type": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "listItem"
+                                                                ]
+                                                              },
+                                                              "content": {
+                                                                "minItems": 1,
+                                                                "type": "array",
+                                                                "items": {
+                                                                  "$ref": "#/components/schemas/RichTextParagraph"
+                                                                }
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "type",
+                                                              "content"
+                                                            ],
+                                                            "additionalProperties": false
+                                                          }
+                                                        }
+                                                      },
+                                                      "required": [
+                                                        "type",
+                                                        "content"
+                                                      ],
+                                                      "additionalProperties": false
+                                                    }
+                                                  ]
+                                                }
+                                              }
+                                            },
+                                            "required": [
+                                              "type",
+                                              "content"
+                                            ],
+                                            "additionalProperties": false
+                                          }
+                                        }
+                                      },
+                                      "required": [
+                                        "type",
+                                        "content"
+                                      ],
+                                      "additionalProperties": false
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "content"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "content"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "orderedList"
+                          ]
+                        },
+                        "content": {
+                          "minItems": 1,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "listItem"
+                                ]
+                              },
+                              "content": {
+                                "minItems": 1,
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "$ref": "#/components/schemas/RichTextParagraph"
+                                    },
+                                    {
+                                      "type": "object",
+                                      "properties": {
+                                        "type": {
+                                          "type": "string",
+                                          "enum": [
+                                            "bulletList"
+                                          ]
+                                        },
+                                        "content": {
+                                          "minItems": 1,
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "type": {
+                                                "type": "string",
+                                                "enum": [
+                                                  "listItem"
+                                                ]
+                                              },
+                                              "content": {
+                                                "minItems": 1,
+                                                "type": "array",
+                                                "items": {
+                                                  "anyOf": [
+                                                    {
+                                                      "$ref": "#/components/schemas/RichTextParagraph"
+                                                    },
+                                                    {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "type": {
+                                                          "type": "string",
+                                                          "enum": [
+                                                            "bulletList"
+                                                          ]
+                                                        },
+                                                        "content": {
+                                                          "minItems": 1,
+                                                          "type": "array",
+                                                          "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                              "type": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "listItem"
+                                                                ]
+                                                              },
+                                                              "content": {
+                                                                "minItems": 1,
+                                                                "type": "array",
+                                                                "items": {
+                                                                  "$ref": "#/components/schemas/RichTextParagraph"
+                                                                }
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "type",
+                                                              "content"
+                                                            ],
+                                                            "additionalProperties": false
+                                                          }
+                                                        }
+                                                      },
+                                                      "required": [
+                                                        "type",
+                                                        "content"
+                                                      ],
+                                                      "additionalProperties": false
+                                                    },
+                                                    {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "type": {
+                                                          "type": "string",
+                                                          "enum": [
+                                                            "orderedList"
+                                                          ]
+                                                        },
+                                                        "content": {
+                                                          "minItems": 1,
+                                                          "type": "array",
+                                                          "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                              "type": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "listItem"
+                                                                ]
+                                                              },
+                                                              "content": {
+                                                                "minItems": 1,
+                                                                "type": "array",
+                                                                "items": {
+                                                                  "$ref": "#/components/schemas/RichTextParagraph"
+                                                                }
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "type",
+                                                              "content"
+                                                            ],
+                                                            "additionalProperties": false
+                                                          }
+                                                        }
+                                                      },
+                                                      "required": [
+                                                        "type",
+                                                        "content"
+                                                      ],
+                                                      "additionalProperties": false
+                                                    }
+                                                  ]
+                                                }
+                                              }
+                                            },
+                                            "required": [
+                                              "type",
+                                              "content"
+                                            ],
+                                            "additionalProperties": false
+                                          }
+                                        }
+                                      },
+                                      "required": [
+                                        "type",
+                                        "content"
+                                      ],
+                                      "additionalProperties": false
+                                    },
+                                    {
+                                      "type": "object",
+                                      "properties": {
+                                        "type": {
+                                          "type": "string",
+                                          "enum": [
+                                            "orderedList"
+                                          ]
+                                        },
+                                        "content": {
+                                          "minItems": 1,
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "type": {
+                                                "type": "string",
+                                                "enum": [
+                                                  "listItem"
+                                                ]
+                                              },
+                                              "content": {
+                                                "minItems": 1,
+                                                "type": "array",
+                                                "items": {
+                                                  "anyOf": [
+                                                    {
+                                                      "$ref": "#/components/schemas/RichTextParagraph"
+                                                    },
+                                                    {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "type": {
+                                                          "type": "string",
+                                                          "enum": [
+                                                            "bulletList"
+                                                          ]
+                                                        },
+                                                        "content": {
+                                                          "minItems": 1,
+                                                          "type": "array",
+                                                          "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                              "type": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "listItem"
+                                                                ]
+                                                              },
+                                                              "content": {
+                                                                "minItems": 1,
+                                                                "type": "array",
+                                                                "items": {
+                                                                  "$ref": "#/components/schemas/RichTextParagraph"
+                                                                }
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "type",
+                                                              "content"
+                                                            ],
+                                                            "additionalProperties": false
+                                                          }
+                                                        }
+                                                      },
+                                                      "required": [
+                                                        "type",
+                                                        "content"
+                                                      ],
+                                                      "additionalProperties": false
+                                                    },
+                                                    {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "type": {
+                                                          "type": "string",
+                                                          "enum": [
+                                                            "orderedList"
+                                                          ]
+                                                        },
+                                                        "content": {
+                                                          "minItems": 1,
+                                                          "type": "array",
+                                                          "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                              "type": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "listItem"
+                                                                ]
+                                                              },
+                                                              "content": {
+                                                                "minItems": 1,
+                                                                "type": "array",
+                                                                "items": {
+                                                                  "$ref": "#/components/schemas/RichTextParagraph"
+                                                                }
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "type",
+                                                              "content"
+                                                            ],
+                                                            "additionalProperties": false
+                                                          }
+                                                        }
+                                                      },
+                                                      "required": [
+                                                        "type",
+                                                        "content"
+                                                      ],
+                                                      "additionalProperties": false
+                                                    }
+                                                  ]
+                                                }
+                                              }
+                                            },
+                                            "required": [
+                                              "type",
+                                              "content"
+                                            ],
+                                            "additionalProperties": false
+                                          }
+                                        }
+                                      },
+                                      "required": [
+                                        "type",
+                                        "content"
+                                      ],
+                                      "additionalProperties": false
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "content"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "content"
+                      ],
+                      "additionalProperties": false
+                    }
+                  ]
+                }
+              }
+            },
+            "required": [
+              "type",
+              "content"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "RichTextParagraph": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "paragraph"
+            ]
+          },
+          "attrs": {
+            "type": "object",
+            "properties": {
+              "textAlign": {
+                "type": "string",
+                "enum": [
+                  "left",
+                  "center",
+                  "right"
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RichTextInline"
+            }
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "additionalProperties": false
+      },
+      "RichTextInline": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "text"
+                ]
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1
+              },
+              "marks": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RichTextMark"
+                }
+              }
+            },
+            "required": [
+              "type",
+              "text"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "hardBreak"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "RichTextMark": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "bold"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "italic"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "underline"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "link"
+                ]
+              },
+              "attrs": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                },
+                "required": [
+                  "href"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "type",
+              "attrs"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "RichTextHeading": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "heading"
+            ]
+          },
+          "attrs": {
+            "type": "object",
+            "properties": {
+              "level": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "enum": [
+                      3
+                    ]
+                  },
+                  {
+                    "type": "number",
+                    "enum": [
+                      4
+                    ]
+                  }
+                ]
+              },
+              "textAlign": {
+                "type": "string",
+                "enum": [
+                  "left",
+                  "center",
+                  "right"
+                ]
+              }
+            },
+            "required": [
+              "level"
+            ],
+            "additionalProperties": false
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RichTextInline"
+            }
+          }
+        },
+        "required": [
+          "type",
+          "attrs"
+        ],
+        "additionalProperties": false
+      },
       "SiteEvent": {
         "type": "object",
         "properties": {
@@ -4985,7 +6735,7 @@
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
           },
           "notes": {
-            "type": "string"
+            "$ref": "#/components/schemas/RichText"
           },
           "icons": {
             "type": "object",

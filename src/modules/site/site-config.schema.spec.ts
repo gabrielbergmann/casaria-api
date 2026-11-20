@@ -223,6 +223,85 @@ describe('SiteConfigSchema', () => {
     ]);
   });
 
+  describe('rich text (spec 020)', () => {
+    const doc = (...content: unknown[]) => ({ type: 'doc', content });
+    const words = (text: string, marks?: unknown[]) => ({ type: 'text', text, marks });
+    const paragraph = (...content: unknown[]) => ({ type: 'paragraph', content });
+    const story = (text: unknown) => withSection(base, 'story', { text, mediaIds: [] });
+    const list = (depth: number): unknown => ({
+      type: 'bulletList',
+      content: [
+        {
+          type: 'listItem',
+          content:
+            depth > 1 ? [paragraph(words('item')), list(depth - 1)] : [paragraph(words('item'))],
+        },
+      ],
+    });
+
+    it('keeps plain text valid and accepts every format of the list (RF01)', () => {
+      const rich = doc(
+        { type: 'heading', attrs: { level: 3 }, content: [words('Como nos conhecemos')] },
+        { type: 'heading', attrs: { level: 4, textAlign: 'center' }, content: [words('2018')] },
+        {
+          type: 'paragraph',
+          attrs: { textAlign: 'right' },
+          content: [
+            words('Foi ', [{ type: 'bold' }, { type: 'italic' }, { type: 'underline' }]),
+            { type: 'hardBreak' },
+            words('no site', [{ type: 'link', attrs: { href: 'https://exemplo.com' } }]),
+            words(' 💍'),
+          ],
+        },
+        { type: 'orderedList', content: [{ type: 'listItem', content: [paragraph(words('um'))] }] },
+        list(3),
+        { type: 'paragraph' },
+      );
+
+      expect(issuesOf(story('Nos conhecemos em 2018.\nEm Floripa.'))).toEqual([]);
+      expect(issuesOf(story(rich))).toEqual([]);
+      expect(
+        issuesOf(withSection(base, 'faq', { items: [{ question: 'P?', answer: rich }] })),
+      ).toEqual([]);
+      expect(
+        issuesOf(
+          withSection(base, 'ceremony', {
+            ceremony: { venueName: 'Igreja', address: 'Rua A', notes: rich },
+            party: null,
+          }),
+        ),
+      ).toEqual([]);
+    });
+
+    it('rejects links that are not http(s), heading 1, extra formats and attributes and 4 list levels (RF07)', () => {
+      const field = ['sections.1.content.text'];
+      // O erro aponta o campo ou um ponto dentro dele (ex.: o href do link).
+      const issuesIn = (config: unknown) => [
+        ...new Set(
+          issuesOf(config).map((path) => path.replace(/^(sections\.1\.content\.text).*/, '$1')),
+        ),
+      ];
+      const link = (href: string) =>
+        doc(paragraph(words('x', [{ type: 'link', attrs: { href } }])));
+
+      expect(issuesIn(story(link('javascript:alert(1)')))).toEqual(field);
+      expect(issuesIn(story(doc({ type: 'heading', attrs: { level: 1 }, content: [] })))).toEqual(
+        field,
+      );
+      expect(
+        issuesOf(
+          story(doc(paragraph(words('x', [{ type: 'textStyle', attrs: { color: 'red' } }])))),
+        ),
+      ).toEqual(field);
+      expect(issuesIn(story(doc({ type: 'paragraph', attrs: { class: 'x' } })))).toEqual(field);
+      expect(issuesIn(story(doc({ type: 'image', attrs: { src: 'https://x/y.png' } })))).toEqual(
+        field,
+      );
+      expect(issuesIn(story('<b>ok</b>'))).toEqual([]);
+      expect(issuesIn(story(doc(list(4))))).toEqual(field);
+    });
+  });
+
   it('rejects an image id that is not a uuid', () => {
     expect(issuesOf(withSection(base, 'gallery', { mediaIds: ['../x.jpg'] }))).toEqual([
       'sections.7.content.mediaIds.0',
