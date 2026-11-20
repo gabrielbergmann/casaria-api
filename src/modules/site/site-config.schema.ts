@@ -16,6 +16,19 @@ const text = z.string();
 // Links só http(s); vazio conta como ausente.
 const httpUrl = z.url({ protocol: /^https?$/, error: 'Use um link http:// ou https://.' });
 const optionalUrl = z.union([z.literal(''), httpUrl]).optional();
+/**
+ * Ícone escolhido pelo casal (spec 019): nome do Lucide ou `none`, sem ícone; ausente usa o padrão.
+ * Só o formato é conferido aqui: o site ignora um nome que não existe (ADR-002).
+ */
+const icon = z
+  .string()
+  .max(64, { error: 'Ícone inválido.' })
+  .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, { error: 'Ícone inválido.' })
+  .optional();
+/** Item de hospedagem e de dicas (spec 019). */
+const linkItems = z.object({
+  items: z.array(z.object({ title: text, description: text.optional(), url: optionalUrl, icon })),
+});
 
 export const ThemeSchema = z
   .object({
@@ -38,11 +51,13 @@ const EventSchema = z
     address: text,
     startsAt: z.iso.datetime({ error: 'Informe a data e a hora.' }).optional(),
     notes: text.optional(),
+    /** Ícones do dia, da hora e do endereço deste evento (spec 019). */
+    icons: z.object({ day: icon, time: icon, address: icon }).optional(),
   })
   .meta({ id: 'SiteEvent' });
 
 const section = <T extends string, C extends z.ZodObject>(type: T, content: C) =>
-  z.object({ type: z.literal(type), enabled: z.boolean(), content });
+  z.object({ type: z.literal(type), enabled: z.boolean(), icon, content });
 
 export const SectionSchema = z
   .discriminatedUnion('type', [
@@ -70,14 +85,10 @@ export const SectionSchema = z
         ),
       }),
     ),
-    section(
-      'lodging',
-      z.object({
-        items: z.array(z.object({ title: text, description: text.optional(), url: optionalUrl })),
-      }),
-    ),
+    section('lodging', linkItems),
+    section('tips', linkItems),
     section('gallery', z.object({ mediaIds: z.array(mediaId) })),
-    section('faq', z.object({ items: z.array(z.object({ question: text, answer: text })) })),
+    section('faq', z.object({ items: z.array(z.object({ question: text, answer: text, icon })) })),
     section(
       'music',
       z.object({
@@ -103,6 +114,7 @@ export const SECTION_TYPES = [
   'dressCode',
   'weddingParty',
   'lodging',
+  'tips',
   'gallery',
   'faq',
   'music',
@@ -119,7 +131,7 @@ export type SectionType = (typeof SECTION_TYPES)[number];
 export const POST_WEDDING_SECTIONS: readonly SectionType[] = ['album', 'thanks'];
 
 /** Sobe a cada mudança de formato; o service migra o documento antigo ao ler (skill site-e-tema §2). */
-export const SITE_CONFIG_VERSION = 2;
+export const SITE_CONFIG_VERSION = 3;
 
 // A ordem do array é a ordem no site; cada seção aparece no máximo uma vez, e só as de
 // `optional` podem faltar.

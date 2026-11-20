@@ -3344,6 +3344,11 @@
               "enabled": {
                 "type": "boolean"
               },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
               "content": {
                 "type": "object",
                 "properties": {},
@@ -3368,6 +3373,11 @@
               },
               "enabled": {
                 "type": "boolean"
+              },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
               },
               "content": {
                 "type": "object",
@@ -3409,6 +3419,11 @@
               },
               "enabled": {
                 "type": "boolean"
+              },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
               },
               "content": {
                 "type": "object",
@@ -3459,6 +3474,11 @@
               "enabled": {
                 "type": "boolean"
               },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
               "content": {
                 "type": "object",
                 "properties": {
@@ -3498,6 +3518,11 @@
               },
               "enabled": {
                 "type": "boolean"
+              },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
               },
               "content": {
                 "type": "object",
@@ -3551,6 +3576,11 @@
               "enabled": {
                 "type": "boolean"
               },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
               "content": {
                 "type": "object",
                 "properties": {
@@ -3578,6 +3608,82 @@
                               "format": "uri"
                             }
                           ]
+                        },
+                        "icon": {
+                          "type": "string",
+                          "maxLength": 64,
+                          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+                        }
+                      },
+                      "required": [
+                        "title"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "items"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "type",
+              "enabled",
+              "content"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "tips"
+                ]
+              },
+              "enabled": {
+                "type": "boolean"
+              },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "content": {
+                "type": "object",
+                "properties": {
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "title": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "url": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                ""
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "format": "uri"
+                            }
+                          ]
+                        },
+                        "icon": {
+                          "type": "string",
+                          "maxLength": 64,
+                          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
                         }
                       },
                       "required": [
@@ -3611,6 +3717,11 @@
               },
               "enabled": {
                 "type": "boolean"
+              },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
               },
               "content": {
                 "type": "object",
@@ -3649,6 +3760,11 @@
               "enabled": {
                 "type": "boolean"
               },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
               "content": {
                 "type": "object",
                 "properties": {
@@ -3662,6 +3778,11 @@
                         },
                         "answer": {
                           "type": "string"
+                        },
+                        "icon": {
+                          "type": "string",
+                          "maxLength": 64,
+                          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
                         }
                       },
                       "required": [
@@ -3696,6 +3817,11 @@
               },
               "enabled": {
                 "type": "boolean"
+              },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
               },
               "content": {
                 "type": "object",
@@ -3758,6 +3884,11 @@
               "enabled": {
                 "type": "boolean"
               },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
               "content": {
                 "type": "object",
                 "properties": {},
@@ -3782,6 +3913,11 @@
               },
               "enabled": {
                 "type": "boolean"
+              },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
               },
               "content": {
                 "type": "object",
@@ -3808,6 +3944,11 @@
               "enabled": {
                 "type": "boolean"
               },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
               "content": {
                 "type": "object",
                 "properties": {},
@@ -3832,6 +3973,11 @@
               },
               "enabled": {
                 "type": "boolean"
+              },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
               },
               "content": {
                 "type": "object",
@@ -3873,6 +4019,11 @@
               },
               "enabled": {
                 "type": "boolean"
+              },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
               },
               "content": {
                 "type": "object",
@@ -3916,6 +4067,27 @@
           },
           "notes": {
             "type": "string"
+          },
+          "icons": {
+            "type": "object",
+            "properties": {
+              "day": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "time": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "address": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              }
+            },
+            "additionalProperties": false
           }
         },
         "required": [
@@ -3963,7 +4135,7 @@
               "version": {
                 "type": "number",
                 "enum": [
-                  2
+                  3
                 ]
               },
               "theme": {
@@ -4126,6 +4298,11 @@
               "enabled": {
                 "type": "boolean"
               },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
               "content": {
                 "type": "object",
                 "properties": {}
@@ -4148,6 +4325,11 @@
               },
               "enabled": {
                 "type": "boolean"
+              },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
               },
               "content": {
                 "type": "object",
@@ -4187,6 +4369,11 @@
               },
               "enabled": {
                 "type": "boolean"
+              },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
               },
               "content": {
                 "type": "object",
@@ -4235,6 +4422,11 @@
               "enabled": {
                 "type": "boolean"
               },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
               "content": {
                 "type": "object",
                 "properties": {
@@ -4272,6 +4464,11 @@
               },
               "enabled": {
                 "type": "boolean"
+              },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
               },
               "content": {
                 "type": "object",
@@ -4322,6 +4519,11 @@
               "enabled": {
                 "type": "boolean"
               },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
               "content": {
                 "type": "object",
                 "properties": {
@@ -4349,6 +4551,79 @@
                               "format": "uri"
                             }
                           ]
+                        },
+                        "icon": {
+                          "type": "string",
+                          "maxLength": 64,
+                          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+                        }
+                      },
+                      "required": [
+                        "title"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "items"
+                ]
+              }
+            },
+            "required": [
+              "type",
+              "enabled",
+              "content"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "tips"
+                ]
+              },
+              "enabled": {
+                "type": "boolean"
+              },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "content": {
+                "type": "object",
+                "properties": {
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "title": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "url": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                ""
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "format": "uri"
+                            }
+                          ]
+                        },
+                        "icon": {
+                          "type": "string",
+                          "maxLength": 64,
+                          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
                         }
                       },
                       "required": [
@@ -4379,6 +4654,11 @@
               },
               "enabled": {
                 "type": "boolean"
+              },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
               },
               "content": {
                 "type": "object",
@@ -4415,6 +4695,11 @@
               "enabled": {
                 "type": "boolean"
               },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
               "content": {
                 "type": "object",
                 "properties": {
@@ -4428,6 +4713,11 @@
                         },
                         "answer": {
                           "type": "string"
+                        },
+                        "icon": {
+                          "type": "string",
+                          "maxLength": 64,
+                          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
                         }
                       },
                       "required": [
@@ -4459,6 +4749,11 @@
               },
               "enabled": {
                 "type": "boolean"
+              },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
               },
               "content": {
                 "type": "object",
@@ -4518,6 +4813,11 @@
               "enabled": {
                 "type": "boolean"
               },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
               "content": {
                 "type": "object",
                 "properties": {}
@@ -4540,6 +4840,11 @@
               },
               "enabled": {
                 "type": "boolean"
+              },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
               },
               "content": {
                 "type": "object",
@@ -4564,6 +4869,11 @@
               "enabled": {
                 "type": "boolean"
               },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
               "content": {
                 "type": "object",
                 "properties": {}
@@ -4586,6 +4896,11 @@
               },
               "enabled": {
                 "type": "boolean"
+              },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
               },
               "content": {
                 "type": "object",
@@ -4625,6 +4940,11 @@
               },
               "enabled": {
                 "type": "boolean"
+              },
+              "icon": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
               },
               "content": {
                 "type": "object",
@@ -4666,6 +4986,26 @@
           },
           "notes": {
             "type": "string"
+          },
+          "icons": {
+            "type": "object",
+            "properties": {
+              "day": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "time": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "address": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              }
+            }
           }
         },
         "required": [
@@ -4679,7 +5019,7 @@
           "version": {
             "type": "number",
             "enum": [
-              2
+              3
             ]
           },
           "theme": {
@@ -4809,7 +5149,7 @@
               "version": {
                 "type": "number",
                 "enum": [
-                  2
+                  3
                 ]
               },
               "theme": {

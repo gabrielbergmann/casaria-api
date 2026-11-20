@@ -8,7 +8,7 @@ import { SiteDocumentTooLarge } from './errors/site-document-too-large';
 import { SiteInvalidAlbumMedia } from './errors/site-invalid-album-media';
 import { SiteInvalidConfig } from './errors/site-invalid-config';
 import { initialSiteConfig } from './initial-site-config';
-import type { SiteConfig } from './site-config.schema';
+import type { SiteConfig, SiteSection } from './site-config.schema';
 import type { SiteRepository } from './site.repository';
 import { SiteService } from './site.service';
 
@@ -339,19 +339,54 @@ describe('SiteService', () => {
       expect(site.media[ALBUM_2]).toBeDefined();
     });
 
-    it('migrates a version 1 document by adding both sections disabled at the end', async () => {
-      const legacy = initialSiteConfig() as unknown as { version: number; sections: unknown[] };
+    it('migrates a version 1 document to version 3: album and thanks at the end, tips after lodging', async () => {
+      const legacy = initialSiteConfig() as unknown as { version: number; sections: SiteSection[] };
       legacy.version = 1;
-      legacy.sections = legacy.sections.slice(0, 12);
+      legacy.sections = legacy.sections.filter(
+        (section) => !['tips', 'album', 'thanks'].includes(section.type),
+      );
       repository.find.mockResolvedValue({ ...published(null), draft: legacy });
 
       const site = await service.getForPanel('wedding-a');
 
-      expect(site.draft.version).toBe(2);
+      expect(site.draft.version).toBe(3);
       expect(site.draft.sections.slice(-2)).toEqual([
         { type: 'album', enabled: false, content: { heading: '', mediaIds: [] } },
         { type: 'thanks', enabled: false, content: { heading: '', text: '' } },
       ]);
+      expect(types(site.draft)).toEqual(types(initialSiteConfig()));
+    });
+
+    it('migrates a version 2 document by adding tips enabled and empty after lodging (spec 019 RF02)', async () => {
+      const legacy = initialSiteConfig() as unknown as { version: number; sections: SiteSection[] };
+      legacy.version = 2;
+      legacy.sections = legacy.sections
+        .filter((section) => section.type !== 'tips')
+        .map((section) =>
+          section.type === 'lodging'
+            ? { ...section, content: { items: [{ title: 'Hotel Central' }] } }
+            : section,
+        );
+      repository.find.mockResolvedValue({
+        ...published(legacy as unknown as SiteConfig),
+        draft: legacy,
+      });
+
+      const panel = await service.getForPanel('wedding-a');
+      const site = await service.getPublic('wedding-a');
+
+      for (const config of [panel.draft, site.config]) {
+        const at = types(config).indexOf('lodging');
+        expect(config.version).toBe(3);
+        expect(config.sections[at]).toMatchObject({
+          content: { items: [{ title: 'Hotel Central' }] },
+        });
+        expect(config.sections[at + 1]).toEqual({
+          type: 'tips',
+          enabled: true,
+          content: { items: [] },
+        });
+      }
     });
 
     it('counts an album photo as in use for the media checker (PRD RF11a)', async () => {

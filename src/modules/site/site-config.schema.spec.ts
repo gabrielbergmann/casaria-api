@@ -40,7 +40,7 @@ describe('initialSiteConfig', () => {
     expect(config.sections.map((section) => section.type)).toEqual([...SECTION_TYPES]);
     // Álbum e agradecimento (spec 014) nascem desativados no fim.
     const enabled = config.sections.filter((section) => section.enabled).map((s) => s.type);
-    expect(enabled).toEqual(SECTION_TYPES.slice(0, 12));
+    expect(enabled).toEqual(SECTION_TYPES.slice(0, -2));
     expect(config.theme).toEqual({
       colors: PALETTES[0].colors,
       fonts: { heading: 'Playfair Display', body: 'Lato' },
@@ -140,7 +140,7 @@ describe('SiteConfigSchema', () => {
     const music = withSection(base, 'music', { songs: [], playlistUrl: 'javascript:alert(1)' });
 
     expect(issuesOf(lodging('javascript:alert(1)'))).toEqual(['sections.5.content.items.0.url']);
-    expect(issuesOf(music)).toEqual(['sections.8.content.playlistUrl']);
+    expect(issuesOf(music)).toEqual(['sections.9.content.playlistUrl']);
     expect(issuesOf(lodging('https://hotel.example.com'))).toEqual([]);
     expect(issuesOf(lodging(''))).toEqual([]);
   });
@@ -187,9 +187,45 @@ describe('SiteConfigSchema', () => {
     ]);
   });
 
+  it('accepts icons on sections, items and event details, and none to hide (spec 019)', () => {
+    const withIcons = {
+      ...withSection(base, 'lodging', {
+        items: [{ title: 'Hotel', icon: 'bed-double' }],
+      }),
+    };
+    withIcons.sections = withIcons.sections.map((section) =>
+      section.type === 'tips'
+        ? { ...section, icon: 'none', content: { items: [{ title: 'Clima', icon: 'sun' }] } }
+        : section.type === 'faq'
+          ? { ...section, content: { items: [{ question: 'Pode?', answer: 'Sim', icon: 'x' }] } }
+          : section,
+    );
+    const ceremony = {
+      venueName: 'Igreja',
+      address: 'Rua A',
+      icons: { day: 'calendar-heart', time: 'clock-4', address: 'map-pinned' },
+    };
+
+    expect(issuesOf(withIcons)).toEqual([]);
+    expect(issuesOf(withSection(base, 'ceremony', { ceremony, party: null }))).toEqual([]);
+  });
+
+  it('rejects an icon name outside the format, pointing at the field (spec 019 RF08)', () => {
+    const config = withSection(base, 'lodging', { items: [{ title: 'Hotel', icon: '../x' }] });
+    config.sections = config.sections.map((section) =>
+      section.type === 'story' ? { ...section, icon: 'Heart' } : section,
+    );
+    const ceremony = { venueName: 'Igreja', address: 'Rua A', icons: { day: 'a'.repeat(65) } };
+
+    expect(issuesOf(config)).toEqual(['sections.1.icon', 'sections.5.content.items.0.icon']);
+    expect(issuesOf(withSection(base, 'ceremony', { ceremony, party: null }))).toEqual([
+      'sections.2.content.ceremony.icons.day',
+    ]);
+  });
+
   it('rejects an image id that is not a uuid', () => {
     expect(issuesOf(withSection(base, 'gallery', { mediaIds: ['../x.jpg'] }))).toEqual([
-      'sections.6.content.mediaIds.0',
+      'sections.7.content.mediaIds.0',
     ]);
   });
 });

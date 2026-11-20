@@ -8,6 +8,7 @@ const EMPTY_SECTIONS: SiteSection[] = [
   { type: 'dressCode', enabled: true, content: { text: '', mediaIds: [] } },
   { type: 'weddingParty', enabled: true, content: { people: [] } },
   { type: 'lodging', enabled: true, content: { items: [] } },
+  { type: 'tips', enabled: true, content: { items: [] } },
   { type: 'gallery', enabled: true, content: { mediaIds: [] } },
   { type: 'faq', enabled: true, content: { items: [] } },
   { type: 'music', enabled: true, content: { songs: [] } },
@@ -21,7 +22,8 @@ const EMPTY_SECTIONS: SiteSection[] = [
 
 /**
  * Documento inicial (spec 007 RF06): primeira paleta, Playfair Display e Lato, sem capa e as
- * seções do PRD ativas, na ordem; álbum e agradecimento (spec 014) entram desativados no fim.
+ * seções do PRD ativas, na ordem, com Dicas depois da hospedagem (spec 019); álbum e
+ * agradecimento (spec 014) entram desativados no fim.
  * Nome do casal e data vêm do cadastro, não daqui.
  */
 export function initialSiteConfig(): SiteConfig {
